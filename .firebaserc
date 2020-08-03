@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "tayabamba-334ac": {
+      "hosting": {
+        "tayabamba": [
+          "tayabamba-334ac"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "tayabamba-334ac"
+  }
+}

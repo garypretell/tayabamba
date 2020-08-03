@@ -1,0 +1,158 @@
+<div class="cards-list">
+    <div class="card">
+        <p></p>
+        <div class="row">
+            <div class="col-md-3 ml-2">
+                <h4>
+                    <strong>
+                        <em>Proyectos</em>
+                    </strong>
+                </h4>
+                <hr>
+            </div>
+            <div class="col text-right">
+                <a class="btn" (click)="showModal()">
+                    <i class="fa fa-plus-circle fa-2x" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body" *ngIf="proyectoService.proyectos$ | async; let proyectos;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-3 ml-auto"><strong><i>Buscar:</i></strong>
+                        <input type="search" name="limpiar" id="limpiar" class="form-control text-uppercase"
+                            [(ngModel)]="searchObject.nombre">
+                    </div>
+                    <div class="col-md-9 modal-body2"><strong><i>resultado de la búsqueda:</i></strong> ({{ proyectos.length }}
+                        registro)
+                        <hr>
+                        <div class="media"
+                            *ngFor="let proyecto of proyectos | filterBy: searchObject | paginate: { itemsPerPage: 8, currentPage: p };trackBy: trackByFn; let i = index">
+                            <img src="../../../assets/imagen.png" class="mr-3" alt="...">
+                            <div class="media-body">
+                                <h5 [ngStyle]="{'color':getColor(proyecto.estado)}" class="mt-0">
+                                    {{ proyecto.nombre | uppercase }}</h5>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"
+                                        [style.width.%]="(proyecto.indexadas*100)/proyecto.total_imagenes"
+                                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                                        {{(proyecto.indexadas*100)/proyecto.total_imagenes  | number:'1.0-0'}}%</div>
+                                </div>
+                                <p></p>
+                                <div class="row justify-content-end">
+                                    <div class="col-5">
+                                        <button class="btn btn-outline-success btn-sm"
+                                            (click)="enableEditing($event, proyecto)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Editar</button>&nbsp;
+                                        <button class="btn btn-outline-danger btn-sm"
+                                            (click)="deleteProyecto(proyecto)">Eliminar</button>
+                                    </div>
+                                    <div class="col-7">
+                                        <div class="float-right"><button class="btn btn-outline-primary btn-sm"
+                                                (click)="goSedes(proyecto)">Sedes</button>&nbsp;
+                                            &nbsp;</div>
+
+                                    </div>
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="col-md-4 mr-auto">
+                <div class="btn-group btn-group-toggle">
+
+                    <button class="btn btn-outline-primary btn-sm">Search</button>
+                    <button class="btn btn-outline-dark btn-sm" (click)="limpiarB()">Clear</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div #myModal class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form class="form" [formGroup]="addProyectoForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Registrar Proyecto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="nombre">Nombre:</label>
+                            <input type="text" class="form-control text-uppercase" id="nombre" name="nombre"
+                                formControlName="nombre" oninput="this.value = this.value.toUpperCase()">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" (click)="addProyecto()" [disabled]="!addProyectoForm.valid">Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div #myModalEdit class="modal fade" id="myModalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form class="form">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Editar Proyecto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-2">
+                    </div>
+                    <div class="row  mb-2">
+                        <div class="col">
+                            <label for="nombreEdit">Proyecto</label>
+                            <input type="text" class="form-control text-uppercase" id="nombreEdit" name="nombreEdit"
+                                [(ngModel)]="proyectotoEdit.nombre" oninput="this.value = this.value.toUpperCase()" readonly>
+                        </div>
+                    </div>
+                    <div class="row  mb-2">
+                        <div class="col">
+                            <label for="transferenciaEdit">Transferencia?:</label>
+                            <select class="form-control" id="transferenciaEdit" name="transferenciaEdit"
+                                [(ngModel)]="proyectotoEdit.transferencia" [ngModelOptions]="{standalone: true}">
+                                <option selected disabled value="">Seleccione...</option>
+                                <option [ngValue]="true">true</option>
+                                <option [ngValue]="false">false</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row  mb-2">
+                        <div class="col">
+                            <label for="estadoEdit">Visible?:</label>
+                            <select class="form-control" id="estadoEdit" name="estadoEdit"
+                                [(ngModel)]="proyectotoEdit.estado" [ngModelOptions]="{standalone: true}">
+                                <option selected disabled value="">Seleccione...</option>
+                                <option [ngValue]="true">true</option>
+                                <option [ngValue]="false">false</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" (click)="updateProyecto(proyectotoEdit)">Save </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

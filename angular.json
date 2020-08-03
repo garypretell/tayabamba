@@ -19,12 +19,18 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": true,
+            "serviceWorker": true,
             "assets": [
+              "src/robots.txt",
               "src/favicon.ico",
-              "src/assets"
+              "src/indexing.ico",
+              "src/firebase-messaging-sw.js",
+              "src/assets",
+              "src/manifest.webmanifest"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/ng2-image-viewer/imageviewer.scss"
             ],
             "scripts": []
           },
@@ -55,7 +61,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "ngsw-config.json"
             }
           }
         },
@@ -85,7 +93,8 @@
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "src/styles.css"
@@ -117,8 +126,16 @@
               "devServerTarget": "tayabamba:serve:production"
             }
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {}
         }
       }
-    }},
-  "defaultProject": "tayabamba"
+    }
+  },
+  "defaultProject": "tayabamba",
+  "cli": {
+    "analytics": "a9624831-5537-4687-b228-db7489063991"
+  }
 }

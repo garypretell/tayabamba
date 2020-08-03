@@ -1,0 +1,66 @@
+<nav aria-label="breadcrumb" class="mt-2">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a [routerLink]="['/']"> Sindex</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Registrar</li>
+    </ol>
+</nav>
+
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="shadow card">
+                <div class="card-body">
+                    <h5 class="card-title">Registro de usuarios</h5>
+                    <hr />
+                    <div class="custom-control custom-switch mb-4">
+                        <input type="checkbox" class="custom-control-input" id="customSwitch1"
+                            [(ngModel)]="checkBoxValue" [ngModelOptions]="{ standalone: true }" />
+                        <label class="custom-control-label text-primary" for="customSwitch1">
+                            Obtener códigos para su Proyecto</label>
+                    </div>
+                    <form *ngIf="!checkBoxValue; else contacto">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Proyecto <small>(código)</small></label>
+                            <input type="password" class="form-control" id="exampleInputEmail1"
+                                aria-describedby="emailHelp"  [(ngModel)]="proyecto" [ngModelOptions]="{ standalone: true }" (ngModelChange)="verificarSede()"  />
+                            <small id="emailHelp" class="form-text text-muted">
+                                *Este campo es requerido.
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Sede <small>(código)</small></label>
+                            <input type="password" class="form-control" id="exampleInputPassword1"  [(ngModel)]="sede" [ngModelOptions]="{ standalone: true }"  (ngModelChange)="verificarSede()" />
+                            <small id="emailHelp" class="form-text text-muted">
+                                *Este campo es requerido.
+                            </small>
+                        </div>
+                        <hr>
+                    </form>
+                    <ng-template #contacto>
+                        <div class="row">
+                            <div class="container">
+                                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                    <strong>Importante!</strong> Para obtener acceso, lo harás por medio de tu cuenta de Google.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-container *ngIf="!checkBoxValue; else btncontacto">
+                        <button type="button" class="btn btn-primary" [disabled]="!validarCodigos" (click)="createWithGoogle()">
+                            Registrar
+                        </button>
+                    </ng-container>
+                    <ng-template #btncontacto>
+                        <button type="button" class="btn btn-outline-primary btn-lg btn-block" (click)="signInWithGoogle()">
+                            Contacto
+                        </button>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
