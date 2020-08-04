@@ -25,7 +25,7 @@
                     <hr>
                     <button class="btn btn-outline-dark btn-sm m-2" (click)="goRegistrar(libro)" >Registrar</button>
                     <button class="btn btn-outline-secondary btn-sm" (click)="goListado(libro)">Partidas</button><br>
-                    <button type="button" class="btn btn-outline-primary btn-sm m-2" (click)="goUpload(libro)">Subir Imágenes <i class="fa fa-cloud-upload" aria-hidden="true"></i></button>
+                    <button type="button" class="btn btn-outline-primary btn-sm m-2" (click)="goUpload(libro)"  *ngIf="auth.canDelete(auth.user$ | async)">Subir Imágenes <i class="fa fa-cloud-upload" aria-hidden="true"></i></button>
                     <div class="go-corner" href="#">
                       <div class="go-arrow">
                         →

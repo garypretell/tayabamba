@@ -4,6 +4,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { Subject } from 'rxjs';
 import { switchMap, map, takeUntil } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-imprimir-registro',
@@ -29,17 +30,26 @@ export class ImprimirRegistroComponent implements OnInit, OnDestroy {
   }
 
   imprimirReg(registro, sede, documento) {
-    this.myTemplate = null;
-    this.data = registro;
-    const ref = this.storage.ref(sede + '/' + documento + '.html');
-    ref.getDownloadURL()
-      .pipe(switchMap((m: string) => {
-        this.url = m.replace('https://firebasestorage.googleapis.com/', '');
-        return this.http.get(this.url, { responseType: 'text' }).pipe(map(data => {
-          this.myTemplate = data.replace(/{{([^}}]+)?}}/g, ($1, $2) =>
-            $2.split('.').reduce((p, c) => p ? p[c] : '', this));
-        }));
-      }), takeUntil(this.unsubscribe$)).subscribe();
+    try {
+      this.myTemplate = null;
+      this.data = registro;
+      const ref = this.storage.ref(sede + '/' + documento + '.html');
+      ref.getDownloadURL()
+        .pipe(switchMap((m: string) => {
+          this.url = m.replace('https://firebasestorage.googleapis.com/', '');
+          return this.http.get(this.url, { responseType: 'text' }).pipe(map(data => {
+            this.myTemplate = data.replace(/{{([^}}]+)?}}/g, ($1, $2) =>
+              $2.split('.').reduce((p, c) => p ? p[c] : '', this));
+          }));
+        }), takeUntil(this.unsubscribe$)).subscribe();
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'No existen un modelo de plantilla en el sistema, agregue uno!'
+      });
+    }
+
   }
 
   print() {

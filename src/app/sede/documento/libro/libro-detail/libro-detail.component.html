@@ -160,7 +160,8 @@
                     <th scope="col" *ngFor="let column of campos.campos | filterBy: userFilterF">
                       {{column.nombre | uppercase}}
                     </th>
-                    <th scope="col">ACCIONES</th>
+                    <th scope="col"  *ngIf="auth.canDelete(auth.user$ | async)">ACCIONES</th>
+                    <th scope="col"  *ngIf="auth.canDelete(auth.user$ | async)">IMAGEN</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -170,7 +171,7 @@
                     <td *ngFor="let col of campos.campos | filterBy: userFilterF">
                       {{item[col.nombre] }}
                     </td>
-                    <td>
+                    <td  *ngIf="auth.canDelete(auth.user$ | async)">
                       <button class="btn btn-outline-primary btn-sm mr-2" (click)="enableEditing($event, item)">
                         <i class="fa fa-pencil"></i> Editar</button>
 
@@ -179,7 +180,10 @@
 
                       <button class="btn btn-outline-secondary btn-sm" (click)="printRegistro(item)"
                         (mouseenter)="seleccionar(item)">
-                        <i class="fa fa-trash"></i> Imprimir</button>
+                        <i class="fa fa-print" aria-hidden="true"></i> Imprimir</button>
+                    </td>
+                    <td  *ngIf="auth.canDelete(auth.user$ | async)">
+                      <a role="button" class="btn btn-outline-secondary btn-sm" target="_blank" href="{{ item.downloadUrl }}"><i class="fa fa-camera" aria-hidden="true"></i> Imagen</a>
                     </td>
                   </tr>
                 </tbody>
@@ -211,7 +215,7 @@
                       <div class="col-xs-8">
                         <div [ngSwitch]="col.tipo">
                           <div *ngSwitchCase="'numerico'">
-                            <input type="number" class="form-control text-uppercase" [(ngModel)]="newObject[col.nombre]"
+                            <input type="number" class="form-control text-uppercase" [(ngModel)]="editObject[col.nombre]"
                               [ngModelOptions]="{standalone: true}" />
                           </div>
                           <div *ngSwitchCase="'fecha'">

@@ -35,6 +35,10 @@
     <div class="mt-2" style="width: 100%; height: 90vh;">
         <as-split direction="horizontal">
             <as-split-area size="20" class="contenedor">
+                <div class="custom-control custom-switch m-2">
+                    <input type="checkbox" class="custom-control-input" id="customSwitch1"  [(ngModel)]="checkBoxValue" [ngModelOptions]="{ standalone: true }">
+                    <label class="custom-control-label" for="customSwitch1">Registrar con imágen</label>
+                  </div>
                 <div class="row">
                     <div class="col">
                         <div class="shadow card bg-primary text-white text-center m-2">

@@ -7,6 +7,7 @@ import { Observable, Subject } from 'rxjs';
 import { switchMap, map, takeUntil } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import * as firebase from 'firebase/app';
+import { AuthService } from 'src/app/auth/auth.service';
 declare var jQuery: any;
 declare const $;
 
@@ -32,6 +33,7 @@ export class LibroComponent implements OnInit, OnDestroy, AfterViewChecked {
   topList$: Observable<any>;
   tipoBusqueda: boolean;
   constructor(
+    public auth: AuthService,
     public formBuilder: FormBuilder,
     public router: Router,
     private afs: AngularFirestore,

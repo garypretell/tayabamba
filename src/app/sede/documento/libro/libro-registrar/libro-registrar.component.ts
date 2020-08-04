@@ -18,6 +18,7 @@ declare const $;
 export class LibroRegistrarComponent implements OnInit, OnDestroy {
   @ViewChild('myModalEditS') myModalEditS: ElementRef;
   private unsubscribe$ = new Subject();
+  checkBoxValue: boolean;
   newObject: any = {};
   editObject: any = {};
   registrotoEdit: any = {};
@@ -45,7 +46,9 @@ export class LibroRegistrarComponent implements OnInit, OnDestroy {
     public afs: AngularFirestore,
     public router: Router,
     private activatedroute: ActivatedRoute
-  ) { }
+  ) {
+    this.checkBoxValue = true;
+  }
 
   sub;
   ngOnInit() {
@@ -60,8 +63,8 @@ export class LibroRegistrarComponent implements OnInit, OnDestroy {
       this.actualizarData(this.miruta);
       this.campos$ = this.afs.doc(`Plantillas/${this.midocumento}`).valueChanges();
       this.registros$ = this.afs.collection(`Registros`, ref => ref.where('sede.id', '==', this.misede)
-    .where('documento', '==', this.documento).where('libro', '==', parseFloat(this.milibro)).orderBy('mifecha', 'desc').limit(6))
-    .valueChanges({ idField: 'id'});
+        .where('documento', '==', this.documento).where('libro', '==', parseFloat(this.milibro)).orderBy('mifecha', 'desc').limit(6))
+        .valueChanges({ idField: 'id' });
     });
 
     this.afs.doc(`Proyecto/${this.miproyecto}`).valueChanges().pipe(switchMap((m: any) => {
@@ -124,26 +127,36 @@ export class LibroRegistrarComponent implements OnInit, OnDestroy {
 
   enableEditing($event, item) {
     this.afs.doc(`Registros/${item.id}`).valueChanges().pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-     console.log(data);
-     this.registrotoEdit = data;
-     this.editObject = data;
+      this.registrotoEdit = data;
+      this.editObject = data;
     });
     this.micodigo = item.id;
     jQuery(this.myModalEditS.nativeElement).modal('show');
   }
 
   updateRegistroS(registrotoEdit) {
-    this.afs.doc(`Registros/${this.micodigo}`).set(this.editObject, {merge: true});
+    this.afs.doc(`Registros/${this.micodigo}`).set(this.editObject, { merge: true });
     jQuery(this.myModalEditS.nativeElement).modal('hide');
   }
 
   goListado() {
     this.router.navigate(['/proyecto', this.miproyecto, 'sede', this.misede, 'documentos',
-    this.documento, 'libros', this.milibro]);
+      this.documento, 'libros', this.milibro]);
   }
 
   add(registro) {
     try {
+      if (this.checkBoxValue) {
+        registro.downloadUrl = this.objImg.downloadUrl;
+        this.objImg.estado = true;
+        this.midata[this.indx] = this.objImg;
+        const imagenes = {
+          imagenes: this.midata
+        };
+        this.afs.doc(`Libros/${this.rutaImg}`).set(imagenes, { merge: true });
+      } else {
+        registro.downloadUrl = 'sin imagen';
+      }
       registro.libro = parseFloat(this.milibro);
       registro.createdAt = (new Date().toISOString().substring(0, 10));
       registro.mifecha = Date.parse(new Date().toISOString().substring(0, 10));
@@ -151,7 +164,7 @@ export class LibroRegistrarComponent implements OnInit, OnDestroy {
       registro.proyecto = this.proyecto;
       registro.sede = this.sede;
       registro.documento = this.documento;
-      registro.downloadUrl = this.objImg.downloadUrl;
+
       this.afs.collection(`Registros`).add(registro);
       const datos = { contador: firebase.firestore.FieldValue.increment(1) };
       const rutaDoc = this.misede + '_' + this.documento;
@@ -160,15 +173,11 @@ export class LibroRegistrarComponent implements OnInit, OnDestroy {
       this.afs.doc(`Libros/${this.miruta}`).set(datos, { merge: true });
       this.newObject = {};
       registro = null;
-      this.objImg.estado = true;
-      this.midata[this.indx] = this.objImg;
-      const imagenes = {
-        imagenes: this.midata
-      };
-      this.afs.doc(`Libros/${this.rutaImg}`).set(imagenes, { merge: true });
       // $('input:text:visible:first').focus();
       $('input:enabled:visible:first').focus();
-      this.cargarImagen();
+      if (this.checkBoxValue) {
+        this.cargarImagen();
+      }
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -176,7 +185,6 @@ export class LibroRegistrarComponent implements OnInit, OnDestroy {
         text: 'No existen imágenes para indexar!'
       });
     }
-
   }
 
   keytab(event) {
@@ -198,12 +206,12 @@ export class LibroRegistrarComponent implements OnInit, OnDestroy {
 
   cargarImagen() {
     this.afs.doc(`Libros/${this.rutaImg}`).valueChanges().pipe(take(1)).subscribe((data: any) => {
-      if (data){
+      if (data) {
         this.midata = data.imagenes;
         this.indx = (data.imagenes).findIndex(x => x.estado === false);
-        const imagen = data.imagenes.filter(f => f.estado === false );
+        const imagen = data.imagenes.filter(f => f.estado === false);
         this.objImg = imagen[0];
-      }else { return of(null); }
+      } else { return of(null); }
     });
   }
 
